@@ -43,4 +43,4 @@ This privacy policy may be updated to reflect changes in the extension's functio
 
 If you have any questions about this privacy policy or the extension, please create an issue on our GitHub repository.
 
-Last updated: [Current Date]
+Last updated: 21.01.2025
