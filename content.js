@@ -7,8 +7,11 @@ function ensureVolumeIsSet() {
   const mediaElement = document.querySelector("video, audio");
   if (mediaElement && lastVolume !== null) {
     const scaledValue = Math.pow(lastVolume / 100, 3) * 100;
-    if (mediaElement.volume !== scaledValue / 100) {
-      mediaElement.volume = scaledValue / 100;
+    const targetVolume = scaledValue / 100;
+
+    // Only adjust if the difference is more than 1%
+    if (Math.abs(mediaElement.volume - targetVolume) > 0.01) {
+      mediaElement.volume = targetVolume;
     }
   }
 }
@@ -126,7 +129,7 @@ function enhanceVolumeControl() {
     if (volumeCheckInterval) {
       clearInterval(volumeCheckInterval);
     }
-    volumeCheckInterval = setInterval(ensureVolumeIsSet, 100);
+    volumeCheckInterval = setInterval(ensureVolumeIsSet, 500);
   }
 }
 
