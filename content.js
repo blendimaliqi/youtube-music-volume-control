@@ -1,5 +1,17 @@
 // Function to enhance volume control
-let lastVolume = null; // Store last volume globally
+let lastVolume = parseFloat(localStorage.getItem("ytMusicVolume")) || null; // Get stored volume
+let volumeCheckInterval = null;
+
+// Function to ensure volume is set correctly
+function ensureVolumeIsSet() {
+  const mediaElement = document.querySelector("video, audio");
+  if (mediaElement && lastVolume !== null) {
+    const scaledValue = Math.pow(lastVolume / 100, 3) * 100;
+    if (mediaElement.volume !== scaledValue / 100) {
+      mediaElement.volume = scaledValue / 100;
+    }
+  }
+}
 
 function enhanceVolumeControl() {
   // Find the volume slider
@@ -32,6 +44,7 @@ function enhanceVolumeControl() {
 
       // Store the raw value for future reference
       lastVolume = rawValue;
+      localStorage.setItem("ytMusicVolume", rawValue.toString());
 
       // More aggressive logarithmic scaling for better low-volume control
       const scaledValue = Math.pow(rawValue / 100, 3) * 100;
@@ -50,7 +63,7 @@ function enhanceVolumeControl() {
       isAdjusting = false;
     }
 
-    // If we have a stored volume, apply it
+    // Apply stored volume immediately when controls are ready
     if (lastVolume !== null) {
       applyCustomVolume(lastVolume, true);
     }
@@ -75,13 +88,45 @@ function enhanceVolumeControl() {
     // Monitor the video element for volume changes
     const mediaElement = document.querySelector("video, audio");
     if (mediaElement) {
+      // Monitor for source changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (
+            mutation.type === "attributes" &&
+            mutation.attributeName === "src"
+          ) {
+            ensureVolumeIsSet();
+          }
+        });
+      });
+
+      observer.observe(mediaElement, {
+        attributes: true,
+        attributeFilter: ["src"],
+      });
+
       mediaElement.addEventListener("volumechange", () => {
         if (!isAdjusting && lastVolume !== null) {
           // If volume changed externally, reapply our stored volume
           applyCustomVolume(lastVolume, true);
         }
       });
+
+      // Also monitor for play events
+      mediaElement.addEventListener("play", () => {
+        ensureVolumeIsSet();
+      });
+
+      mediaElement.addEventListener("loadeddata", () => {
+        ensureVolumeIsSet();
+      });
     }
+
+    // Set up interval to periodically check volume
+    if (volumeCheckInterval) {
+      clearInterval(volumeCheckInterval);
+    }
+    volumeCheckInterval = setInterval(ensureVolumeIsSet, 100);
   }
 }
 
