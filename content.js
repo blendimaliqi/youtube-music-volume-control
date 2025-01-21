@@ -1,7 +1,7 @@
 // Function to enhance volume control
 let lastVolume = parseFloat(localStorage.getItem("ytMusicVolume")) || null; // Get stored volume
 let isAdjusting = false;
-const VOLUME_THRESHOLD = 0.0001; // 0.01% threshold
+const VOLUME_THRESHOLD = 0.001; // Increase threshold to 0.1%
 
 // Function to ensure volume is set correctly
 function ensureVolumeIsSet() {
@@ -48,7 +48,7 @@ function enhanceVolumeControl() {
         localStorage.setItem("ytMusicVolume", rawValue.toString());
 
         // More aggressive logarithmic scaling for better low-volume control
-        const scaledValue = Math.pow(rawValue / 100, 3) * 100;
+        const scaledValue = Math.pow(rawValue / 100, 2) * 100;
 
         // Find and update the media element volume
         const mediaElement = document.querySelector("video, audio");
