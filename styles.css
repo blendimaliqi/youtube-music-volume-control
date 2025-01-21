@@ -1,0 +1,8 @@
+/* Target YouTube's paper slider */
+tp-yt-paper-slider#volume-slider {
+  --paper-slider-input: {
+    width: 200px !important; /* Longer slider */
+  }
+
+  --paper-progress-active-color: #4285f4 !important; /* Blue progress bar */
+}
