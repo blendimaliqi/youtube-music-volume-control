@@ -1,16 +1,16 @@
 // Function to enhance volume control
 let lastVolume = parseFloat(localStorage.getItem("ytMusicVolume")) || null; // Get stored volume
-let volumeCheckInterval = null;
+let isAdjusting = false;
+const VOLUME_THRESHOLD = 0.0001; // 0.01% threshold
 
 // Function to ensure volume is set correctly
 function ensureVolumeIsSet() {
   const mediaElement = document.querySelector("video, audio");
-  if (mediaElement && lastVolume !== null) {
+  if (mediaElement && lastVolume !== null && !isAdjusting) {
     const scaledValue = Math.pow(lastVolume / 100, 3) * 100;
     const targetVolume = scaledValue / 100;
 
-    // Only adjust if the difference is more than 1%
-    if (Math.abs(mediaElement.volume - targetVolume) > 0.01) {
+    if (Math.abs(mediaElement.volume - targetVolume) > VOLUME_THRESHOLD) {
       mediaElement.volume = targetVolume;
     }
   }
@@ -23,8 +23,6 @@ function enhanceVolumeControl() {
   );
 
   if (volumeSlider) {
-    let isAdjusting = false;
-
     // Make steps smaller for finer control
     volumeSlider.setAttribute("step", "0.1");
     volumeSlider.setAttribute("aria-valuemin", "0");
@@ -44,26 +42,27 @@ function enhanceVolumeControl() {
       if (isAdjusting && !force) return;
 
       isAdjusting = true;
+      try {
+        // Store the raw value for future reference
+        lastVolume = rawValue;
+        localStorage.setItem("ytMusicVolume", rawValue.toString());
 
-      // Store the raw value for future reference
-      lastVolume = rawValue;
-      localStorage.setItem("ytMusicVolume", rawValue.toString());
+        // More aggressive logarithmic scaling for better low-volume control
+        const scaledValue = Math.pow(rawValue / 100, 3) * 100;
 
-      // More aggressive logarithmic scaling for better low-volume control
-      const scaledValue = Math.pow(rawValue / 100, 3) * 100;
+        // Find and update the media element volume
+        const mediaElement = document.querySelector("video, audio");
+        if (mediaElement) {
+          mediaElement.volume = scaledValue / 100;
+        }
 
-      // Find and update the media element volume
-      const mediaElement = document.querySelector("video, audio");
-      if (mediaElement) {
-        mediaElement.volume = scaledValue / 100;
+        // Ensure the slider UI reflects the correct value
+        if (volumeSlider.value !== rawValue) {
+          volumeSlider.value = rawValue;
+        }
+      } finally {
+        isAdjusting = false;
       }
-
-      // Ensure the slider UI reflects the correct value
-      if (volumeSlider.value !== rawValue) {
-        volumeSlider.value = rawValue;
-      }
-
-      isAdjusting = false;
     }
 
     // Apply stored volume immediately when controls are ready
@@ -110,26 +109,15 @@ function enhanceVolumeControl() {
 
       mediaElement.addEventListener("volumechange", () => {
         if (!isAdjusting && lastVolume !== null) {
-          // If volume changed externally, reapply our stored volume
-          applyCustomVolume(lastVolume, true);
+          ensureVolumeIsSet();
         }
       });
 
       // Also monitor for play events
-      mediaElement.addEventListener("play", () => {
-        ensureVolumeIsSet();
-      });
-
-      mediaElement.addEventListener("loadeddata", () => {
-        ensureVolumeIsSet();
-      });
+      mediaElement.addEventListener("play", ensureVolumeIsSet);
+      mediaElement.addEventListener("loadeddata", ensureVolumeIsSet);
+      mediaElement.addEventListener("canplay", ensureVolumeIsSet);
     }
-
-    // Set up interval to periodically check volume
-    if (volumeCheckInterval) {
-      clearInterval(volumeCheckInterval);
-    }
-    volumeCheckInterval = setInterval(ensureVolumeIsSet, 500);
   }
 }
 
