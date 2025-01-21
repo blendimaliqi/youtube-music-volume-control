@@ -17,8 +17,11 @@ This extension:
 
 The only data stored is:
 
-- Your last used volume setting, which is saved locally in your browser's localStorage
-- This data never leaves your device and is only used to maintain your volume preference between page refreshes
+- Your last used volume setting (stored as "ytMusicVolume" in localStorage)
+- This data never leaves your device and is used to:
+  - Maintain your volume preference between page refreshes
+  - Automatically restore your last volume setting when reopening YouTube Music
+  - Ensure consistent volume control across sessions
 
 ## Permissions
 
@@ -33,7 +36,7 @@ This extension:
 
 - Does NOT use any third-party services
 - Does NOT integrate with external APIs
-- Only interacts with music.youtube.com's native volume controls
+- Only interacts with music.youtube.com's native audio system
 
 ## Updates
 
@@ -43,4 +46,4 @@ This privacy policy may be updated to reflect changes in the extension's functio
 
 If you have any questions about this privacy policy or the extension, please create an issue on our GitHub repository.
 
-Last updated: 21.01.2025
+Last updated: 21-01-2025
