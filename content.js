@@ -60,19 +60,29 @@ function createCustomVolumeControl() {
     
     .custom-volume-control {
       width: 150px;
-      height: 40px;
+      height: 24px;
       display: flex;
       align-items: center;
       margin-right: 8px;
+      position: relative;
     }
     
     .custom-volume-slider {
       -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      width: 150px;
+      height: 24px;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .custom-volume-slider::-webkit-slider-runnable-track {
       width: 100%;
       height: 4px;
-      border-radius: 2px;
       background: rgba(255, 255, 255, 0.3);
-      outline: none;
+      border-radius: 2px;
+      border: none;
     }
     
     .custom-volume-slider::-webkit-slider-thumb {
@@ -80,14 +90,10 @@ function createCustomVolumeControl() {
       appearance: none;
       width: 12px;
       height: 12px;
+      background: white;
       border-radius: 50%;
-      background: #fff;
+      margin-top: -4px;
       cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .custom-volume-slider::-webkit-slider-thumb:hover {
-      transform: scale(1.2);
     }
   `;
   document.head.appendChild(style);
@@ -105,12 +111,21 @@ function createCustomVolumeControl() {
 
   volumeControl.appendChild(slider);
 
-  // Add volume control next to the player controls
+  // Find the correct insertion point
   const targetElement = document.querySelector(
     "tp-yt-paper-slider#volume-slider"
   );
   if (targetElement && targetElement.parentElement) {
-    targetElement.parentElement.insertBefore(volumeControl, targetElement);
+    // Get the volume icon element
+    const volumeIcon =
+      targetElement.parentElement.querySelector("#volume-icon");
+    if (volumeIcon) {
+      // Insert after the volume icon
+      volumeIcon.insertAdjacentElement("afterend", volumeControl);
+    } else {
+      // Fallback to original placement
+      targetElement.parentElement.insertBefore(volumeControl, targetElement);
+    }
     isControlCreated = true;
   }
 
@@ -121,7 +136,7 @@ function createCustomVolumeControl() {
     localStorage.setItem("ytMusicVolume", value.toString());
 
     if (gainNode && audioContext) {
-      const scaledValue = Math.pow(value / 100, 3.5);
+      const scaledValue = value === 0 ? 0 : Math.pow(value / 100, 2);
       gainNode.gain.setTargetAtTime(
         scaledValue,
         audioContext.currentTime,
@@ -143,9 +158,18 @@ function createCustomVolumeControl() {
 // Initialize when the page loads
 function initialize() {
   // Wait for a short delay to ensure the page is ready
-  setTimeout(() => {
+  setTimeout(async () => {
     createCustomVolumeControl();
-    // Don't initialize audio context immediately, wait for user interaction
+    // Initialize audio context and set volume immediately
+    await initializeAudioContext();
+    if (gainNode && audioContext) {
+      const scaledValue = Math.pow(lastVolume / 100, 2);
+      gainNode.gain.setTargetAtTime(
+        scaledValue,
+        audioContext.currentTime,
+        0.01
+      );
+    }
   }, 1000);
 }
 
