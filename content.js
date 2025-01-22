@@ -30,7 +30,7 @@ async function initializeAudioContext() {
     gainNode.connect(audioContext.destination);
 
     // Set initial volume
-    const scaledValue = Math.pow(lastVolume / 100, 3.5);
+    const scaledValue = Math.pow(lastVolume / 100, 2) * 2;
     gainNode.gain.value = scaledValue;
 
     isInitialized = true;
@@ -136,7 +136,7 @@ function createCustomVolumeControl() {
     localStorage.setItem("ytMusicVolume", value.toString());
 
     if (gainNode && audioContext) {
-      const scaledValue = value === 0 ? 0 : Math.pow(value / 100, 2);
+      const scaledValue = value === 0 ? 0 : Math.pow(value / 100, 2) * 2;
       gainNode.gain.setTargetAtTime(
         scaledValue,
         audioContext.currentTime,
@@ -163,7 +163,7 @@ function initialize() {
     // Initialize audio context and set volume immediately
     await initializeAudioContext();
     if (gainNode && audioContext) {
-      const scaledValue = Math.pow(lastVolume / 100, 2);
+      const scaledValue = Math.pow(lastVolume / 100, 2) * 2;
       gainNode.gain.setTargetAtTime(
         scaledValue,
         audioContext.currentTime,
