@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube Music Volume Control",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Improves volume control for YouTube Music with finer adjustments at lower volumes",
   "icons": {
     "16": "icons/icon16.png",
