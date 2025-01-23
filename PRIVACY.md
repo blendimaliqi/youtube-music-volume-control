@@ -27,8 +27,7 @@ The only data stored is:
 
 The extension requires minimal permissions:
 
-- "activeTab": To modify the volume control on music.youtube.com
-- "scripting": To inject the necessary code for volume control functionality
+- Access to "music.youtube.com": To modify the volume control functionality on YouTube Music
 
 ## Third-Party Services
 
@@ -46,4 +45,4 @@ This privacy policy may be updated to reflect changes in the extension's functio
 
 If you have any questions about this privacy policy or the extension, please create an issue on our GitHub repository.
 
-Last updated: 21-01-2025
+Last updated: 23-01-2025
