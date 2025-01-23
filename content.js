@@ -29,8 +29,8 @@ async function initializeAudioContext() {
     source.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
-    // Set initial volume
-    const scaledValue = Math.pow(lastVolume / 100, 2) * 2;
+    // Set initial volume with cubic scaling
+    const scaledValue = Math.pow(lastVolume / 100, 3) * 3;
     gainNode.gain.value = scaledValue;
 
     isInitialized = true;
@@ -111,6 +111,15 @@ function createCustomVolumeControl() {
 
   volumeControl.appendChild(slider);
 
+  // Prevent click events from propagating up to prevent player UI show/hide
+  volumeControl.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  volumeControl.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+  });
+
   // Find the correct insertion point
   const targetElement = document.querySelector(
     "tp-yt-paper-slider#volume-slider"
@@ -136,7 +145,7 @@ function createCustomVolumeControl() {
     localStorage.setItem("ytMusicVolume", value.toString());
 
     if (gainNode && audioContext) {
-      const scaledValue = value === 0 ? 0 : Math.pow(value / 100, 2) * 2;
+      const scaledValue = value === 0 ? 0 : Math.pow(value / 100, 3) * 3;
       gainNode.gain.setTargetAtTime(
         scaledValue,
         audioContext.currentTime,
@@ -163,7 +172,7 @@ function initialize() {
     // Initialize audio context and set volume immediately
     await initializeAudioContext();
     if (gainNode && audioContext) {
-      const scaledValue = Math.pow(lastVolume / 100, 2) * 2;
+      const scaledValue = Math.pow(lastVolume / 100, 3) * 3;
       gainNode.gain.setTargetAtTime(
         scaledValue,
         audioContext.currentTime,
