@@ -4,41 +4,54 @@ let audioContext = null;
 let gainNode = null;
 let isInitialized = false;
 let isControlCreated = false;
+let currentMediaElement = null;
 
 // Initialize audio processing
 async function initializeAudioContext() {
-  if (isInitialized) return;
-
   const mediaElement = document.querySelector("video, audio");
   if (!mediaElement) {
     console.log("No media element found yet");
     return;
   }
 
-  try {
-    // Wait for user interaction before creating AudioContext
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      await audioContext.resume();
+  // Check if we need to reinitialize due to new media element
+  if (currentMediaElement && currentMediaElement !== mediaElement) {
+    // Clean up old connections
+    if (gainNode) {
+      gainNode.disconnect();
     }
+    isInitialized = false;
+  }
 
-    const source = audioContext.createMediaElementSource(mediaElement);
-    gainNode = audioContext.createGain();
+  try {
+    // Initialize if not initialized or if media element changed
+    if (!isInitialized) {
+      // Create new AudioContext if needed
+      if (!audioContext || audioContext.state === "closed") {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        await audioContext.resume();
+      }
 
-    // Connect the audio nodes
-    source.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+      const source = audioContext.createMediaElementSource(mediaElement);
+      gainNode = audioContext.createGain();
 
-    // Set initial volume with cubic scaling
-    const scaledValue = Math.pow(lastVolume / 100, 3) * 3;
-    gainNode.gain.value = scaledValue;
+      // Connect the audio nodes
+      source.connect(gainNode);
+      gainNode.connect(audioContext.destination);
 
-    isInitialized = true;
-    console.log("Audio context initialized successfully");
+      // Set initial volume with cubic scaling
+      const scaledValue = Math.pow(lastVolume / 100, 3) * 3;
+      gainNode.gain.value = scaledValue;
+
+      currentMediaElement = mediaElement;
+      isInitialized = true;
+      console.log("Audio context initialized successfully");
+    }
   } catch (error) {
     console.error("Error initializing audio context:", error);
     // Reset state on error
     isInitialized = false;
+    currentMediaElement = null;
     audioContext = null;
     gainNode = null;
   }
@@ -166,18 +179,24 @@ function createCustomVolumeControl() {
 
 // Initialize when the page loads
 function initialize() {
-  // Wait for a short delay to ensure the page is ready
   setTimeout(async () => {
     createCustomVolumeControl();
-    // Initialize audio context and set volume immediately
     await initializeAudioContext();
-    if (gainNode && audioContext) {
-      const scaledValue = Math.pow(lastVolume / 100, 3) * 3;
-      gainNode.gain.setTargetAtTime(
-        scaledValue,
-        audioContext.currentTime,
-        0.01
-      );
+
+    const mediaObserver = new MutationObserver(async (mutations) => {
+      const mediaElement = document.querySelector("video, audio");
+      if (mediaElement && mediaElement !== currentMediaElement) {
+        await initializeAudioContext();
+      }
+    });
+
+    // Observe changes to the player container
+    const playerContainer = document.querySelector("#movie_player");
+    if (playerContainer) {
+      mediaObserver.observe(playerContainer, {
+        childList: true,
+        subtree: true,
+      });
     }
   }, 1000);
 }
