@@ -1,5 +1,5 @@
 {
-  "manifest_version": 4,
+  "manifest_version": 3,
   "name": "YouTube Music Volume Control",
   "version": "1.2",
   "description": "Improves volume control for YouTube Music with finer adjustments at lower volumes",
