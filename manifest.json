@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Volume Slider Fix for YouTube Music",
-  "version": "1.2",
-  "description": "Fix YouTube Music being too loud! Better volume slider with precise low-volume control while keeping max volume as normal.",
+  "version": "1.3",
+  "description": "Fix YouTube Music being too loud. Better volume slider with precise low-volume control while keeping max volume as normal.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon32.png",
