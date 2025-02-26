@@ -1,14 +1,25 @@
+import VolumeControlUI from "./volumeControlUI";
+
 // Function to enhance volume control
-let lastVolume = parseFloat(localStorage.getItem("ytMusicVolume")) || 100;
-let audioContext = null;
-let gainNode = null;
-let isInitialized = false;
-let isControlCreated = false;
-let currentMediaElement = null;
+let lastVolume: number = parseFloat(
+  localStorage.getItem("ytMusicVolume") || "100"
+);
+let audioContext: AudioContext | null = null;
+let gainNode: GainNode | null = null;
+let isInitialized: boolean = false;
+let isControlCreated: boolean = false;
+let currentMediaElement: HTMLMediaElement | null = null;
+
+// Define type for our window extension
+declare global {
+  interface Window {
+    volumeControlObserver?: MutationObserver;
+  }
+}
 
 // Initialize audio processing
-async function initializeAudioContext() {
-  const mediaElement = document.querySelector("video, audio");
+async function initializeAudioContext(): Promise<void> {
+  const mediaElement = document.querySelector<HTMLMediaElement>("video, audio");
   if (!mediaElement) {
     console.log("No media element found yet");
     return;
@@ -28,7 +39,8 @@ async function initializeAudioContext() {
     if (!isInitialized) {
       // Create new AudioContext if needed
       if (!audioContext || audioContext.state === "closed") {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioContext = new (window.AudioContext ||
+          (window as any).webkitAudioContext)();
         await audioContext.resume();
       }
 
@@ -57,16 +69,19 @@ async function initializeAudioContext() {
   }
 }
 
-function createCustomVolumeControl() {
+function createCustomVolumeControl(): HTMLDivElement | undefined {
   if (isControlCreated) return;
 
   // Remove any existing custom controls first
-  const existingControls = document.querySelectorAll(".custom-volume-control");
+  const existingControls = document.querySelectorAll<HTMLDivElement>(
+    ".custom-volume-control"
+  );
   existingControls.forEach((control) => control.remove());
 
   // Handle volume changes
-  const onVolumeChange = (e) => {
-    const value = parseFloat(e.target.value);
+  const onVolumeChange = (e: Event): void => {
+    const target = e.target as HTMLInputElement;
+    const value = parseFloat(target.value);
     lastVolume = value;
     localStorage.setItem("ytMusicVolume", value.toString());
 
@@ -81,7 +96,7 @@ function createCustomVolumeControl() {
   };
 
   // Handle first interaction
-  const onFirstInteraction = () => {
+  const onFirstInteraction = (): void => {
     if (!isInitialized) {
       initializeAudioContext();
     }
@@ -101,13 +116,14 @@ function createCustomVolumeControl() {
 }
 
 // Initialize when the page loads
-function initialize() {
+function initialize(): void {
   setTimeout(async () => {
     createCustomVolumeControl();
     await initializeAudioContext();
 
-    const mediaObserver = new MutationObserver(async (mutations) => {
-      const mediaElement = document.querySelector("video, audio");
+    const mediaObserver = new MutationObserver(async () => {
+      const mediaElement =
+        document.querySelector<HTMLMediaElement>("video, audio");
       if (mediaElement && mediaElement !== currentMediaElement) {
         await initializeAudioContext();
       }

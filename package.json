@@ -1,0 +1,17 @@
+{
+  "name": "youtube-music-volume-control",
+  "version": "2.0.0",
+  "description": "Better volume control for YouTube Music",
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "tsc": "tsc"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.217",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.0.0",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^5.1.4"
+  }
+}
