@@ -10,7 +10,7 @@ let currentMediaElement = null;
 async function initializeAudioContext() {
   const mediaElement = document.querySelector("video, audio");
   if (!mediaElement) {
-    console.log("No media element found yet");
+    console.log("No media element found yet ");
     return;
   }
 
