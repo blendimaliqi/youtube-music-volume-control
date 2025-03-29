@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "YouTube Music Volume Control",
-  "version": "1.3",
-  "description": "Improves volume control for YouTube Music with finer adjustments at lower volumes",
+  "version": "2.0",
+  "description": "Fix YouTube Music being too loud. Better volume slider with precise low-volume control while keeping max volume as normal.",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon32.png",
@@ -13,7 +13,8 @@
     {
       "matches": ["*://music.youtube.com/*"],
       "css": ["volumeControl.css"],
-      "js": ["volumeControlUI.js", "content.js"]
+      "js": ["dist/volumeControlUI.js", "dist/content.js"]
     }
-  ]
+  ],
+  "permissions": ["storage"]
 }

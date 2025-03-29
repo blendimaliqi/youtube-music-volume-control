@@ -3,7 +3,7 @@ tp-yt-paper-slider#volume-slider {
 }
 
 .custom-volume-control {
-  width: 150px;
+  width: 180px;
   height: 24px;
   display: flex;
   align-items: center;
@@ -38,4 +38,28 @@ tp-yt-paper-slider#volume-slider {
   border-radius: 50%;
   margin-top: -4px;
   cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.custom-volume-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+}
+
+/* Active track color to show current volume level */
+.custom-volume-slider.active-track::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    rgba(255, 0, 0, 0.7) 0%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+}
+
+/* Volume display styles */
+.volume-display {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.custom-volume-control:hover .volume-display {
+  opacity: 1;
 }
