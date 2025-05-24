@@ -15,6 +15,5 @@
       "css": ["volumeControl.css"],
       "js": ["dist/volumeControlUI.js", "dist/content.js"]
     }
-  ],
-  "permissions": ["storage"]
+  ]
 }

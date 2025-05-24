@@ -52,7 +52,7 @@ async function initializeAudioContext(): Promise<void> {
       gainNode.connect(audioContext.destination);
 
       // Set initial volume with cubic scaling
-      const scaledValue = Math.pow(lastVolume / 100, 3) * 3;
+      const scaledValue = Math.pow(lastVolume / 100, 3);
       gainNode.gain.value = scaledValue;
 
       currentMediaElement = mediaElement;
@@ -86,7 +86,7 @@ function createCustomVolumeControl(): HTMLDivElement | undefined {
     localStorage.setItem("ytMusicVolume", value.toString());
 
     if (gainNode && audioContext) {
-      const scaledValue = value === 0 ? 0 : Math.pow(value / 100, 3) * 3;
+      const scaledValue = value === 0 ? 0 : Math.pow(value / 100, 3);
       gainNode.gain.setTargetAtTime(
         scaledValue,
         audioContext.currentTime,

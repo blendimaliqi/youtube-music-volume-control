@@ -57,6 +57,29 @@ const VolumeControlUI: VolumeControlUIInterface = {
       volumeDisplay.textContent = `${Math.round(parseFloat(target.value))}%`;
     });
 
+    // Handle mouse wheel scrolling for volume adjustment
+    volumeControl.addEventListener("wheel", (e: WheelEvent) => {
+      e.preventDefault();
+      const scrollStep = 5; // Adjust volume by 5 units per scroll step
+      let currentValue = parseFloat(slider.value);
+
+      if (e.deltaY < 0) {
+        // Scroll up
+        currentValue = Math.min(100, currentValue + scrollStep);
+      } else {
+        // Scroll down
+        currentValue = Math.max(0, currentValue - scrollStep);
+      }
+
+      slider.value = currentValue.toString();
+      // Manually trigger the input event to ensure onVolumeChange and display update
+      const inputEvent = new Event("input", {
+        bubbles: true,
+        cancelable: true,
+      });
+      slider.dispatchEvent(inputEvent);
+    });
+
     // Initialize audio context on first user interaction
     slider.addEventListener("mousedown", onFirstInteraction);
 
